@@ -1,5 +1,8 @@
 ngx.header.content_type = "text/plain";
 --------------------------------- variable --------------------------------------------
+local weightRules = {};
+local weightSum = 0;
+
 --------------------------------- function --------------------------------------------
 local addressNo = function(address)
      local pattern = "^(%d+)%.(%d+)%.(%d+)%.(%d+)$";
@@ -28,13 +31,31 @@ local parseRule = function(line)
 	 return ret;
 end;
 
+local parseRuleByWeigth = function(line)
+	 local pattern = "^%s*(%d+)%s+(.+)%s*;%s*$";
+	 local weight = line:gsub(pattern, "%1");
+	 local pageAddr = line:gsub(pattern, "%2");
+	 weightRules[weight] = pageAddr;
+	 weightSum = weightSum + weight;
+end;
 
-
+local initialWeightRules = function(file)
+    if next(weightRules) ~= nil then
+		return;
+	end;
+	line = file:read("*l");
+	while line ~= nil do
+		if line:find("%w") ~= nil and line:find("}") == nil then
+		    parseRuleByWeigth(line);
+		end;
+		line = file:read("*l");
+	end;
+end;
 --------------------------------- main ------------------------------------------------
 
 --ngx.header.content_type = "text/plain";
 
-local file = io.open("/home/maxim/App/openresty/nginx/conf/abtest.conf", "r");
+local file = io.open("/home/maxim/App/openresty/nginx/conf/abtest_weight.conf", "r");
 local line = file:read("*l");
 local fork = nil;
 while line ~= nil do 
@@ -61,7 +82,20 @@ if fork == "address" then
 		end;
 		line = file:read("*l");
 	end;
-    
+
+elseif fork == "weight" then
+	
+	initialWeightRules(file);
+	local randomNum = math.random(1, weightSum);
+	local periphery = 0;
+	for weight, page in pairs(weightRules) do 
+		periphery = periphery + weight;
+		if 0 < randomNum and randomNum <= periphery then
+			ngx.redirect(page);
+			break;
+		end;
+	end
+	
 end;
 
 file:close();
