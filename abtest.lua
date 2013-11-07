@@ -53,9 +53,7 @@ local initialWeightRules = function(file)
 end;
 --------------------------------- main ------------------------------------------------
 
---ngx.header.content_type = "text/plain";
-
-local file = io.open("/home/maxim/App/openresty/nginx/conf/abtest_weight.conf", "r");
+local file = io.open("/home/maxim/App/openresty/nginx/conf/abtest_count.conf", "r");
 local line = file:read("*l");
 local fork = nil;
 while line ~= nil do 
@@ -95,6 +93,37 @@ elseif fork == "weight" then
 			break;
 		end;
 	end
+	
+
+elseif fork == "reqLimit" then
+	
+    line = file:read("*l");
+	while line ~= nil do
+		if line:find("%w") ~= nil and line:find("}") == nil then
+			local pattern = "^%s*(%d+)%s+(.+)%s*;%s*$";
+			local defaultPageAddr = nil;
+			if line:find("default") ~= nil then
+				defaultPageAddr = line:gsub("^%s*default%s+(.+)%s*;%s*$", "%1");
+				ngx.redirect(defaultPageAddr);
+				break;
+			end;
+			
+			local confReqCount = tonumber((line:gsub(pattern, "%1")));
+			local pageAddr = line:gsub(pattern, "%2");
+			
+		    local sharedMem = ngx.shared.sharedMem;
+	     	local reqCount = sharedMem:get("reqCount");
+			reqCount = reqCount + 1;
+
+			if confReqCount >= reqCount then
+			    sharedMem:set("reqCount", reqCount);
+				ngx.redirect(pageAddr);
+				break;
+			end;
+
+		end;
+		line = file:read("*l");
+	end;
 	
 end;
 
