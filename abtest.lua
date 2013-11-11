@@ -2,6 +2,32 @@ ngx.header.content_type = "text/plain";
 --------------------------------- variable --------------------------------------------
 local weightRules = {};
 local weightSum = 0;
+local remote_addr = ngx.var.remote_addr;
+--------------------------------- initial  --------------------------------------------
+local redis = require "resty.redis";
+local red = redis:new();
+
+red:set_timeout(1000) -- 1 second
+local ok, err = red:connect("127.0.0.1", 6379)
+if not ok then
+   ngx.log(ngx.ERR, "failed to connect to redis: ", err);
+   return ngx.exit(500);
+end;
+
+
+if red:exists(remote_addr) == 1 then
+    local cachePageAddr, err = red:get(ngx.var.remote_addr);
+	if not cachePageAddr then
+		    ngx.log(ngx.ERR, "failed to get redis key: ", err);
+		    return ngx.exit(500);
+	end;
+
+ 	ngx.redirect(cachePageAddr);
+	--ngx.say(cachePageAddr);
+	return;
+end;
+
+
 
 --------------------------------- function --------------------------------------------
 local addressNo = function(address)
@@ -13,7 +39,7 @@ local addressNo = function(address)
 	 return no1 + no2 + no3 + no4;
 end;
 
-local remoteInt = addressNo(ngx.var.remote_addr);
+local remoteInt = addressNo(remote_addr);
 
 local parseRule = function(line)
 	 local ret = nil;
@@ -74,7 +100,6 @@ if fork == "address" then
 		    local _pageAddr = parseRule(line);
 			if(nil ~= _pageAddr) then
 				pageAddr = _pageAddr;
-				ngx.redirect(pageAddr);
 				break;
 			end;
 		end;
@@ -86,10 +111,10 @@ elseif fork == "weight" then
 	initialWeightRules(file);
 	local randomNum = math.random(1, weightSum);
 	local periphery = 0;
-	for weight, page in pairs(weightRules) do 
+	for weight, _pageAddr in pairs(weightRules) do 
 		periphery = periphery + weight;
 		if 0 < randomNum and randomNum <= periphery then
-			ngx.redirect(page);
+			pageAddr = _pageAddr;
 			break;
 		end;
 	end
@@ -104,12 +129,12 @@ elseif fork == "reqLimit" then
 			local defaultPageAddr = nil;
 			if line:find("default") ~= nil then
 				defaultPageAddr = line:gsub("^%s*default%s+(.+)%s*;%s*$", "%1");
-				ngx.redirect(defaultPageAddr);
+				pageAddr = defaultPageAddr;
 				break;
 			end;
 			
 			local confReqCount = tonumber((line:gsub(pattern, "%1")));
-			local pageAddr = line:gsub(pattern, "%2");
+			local _pageAddr = line:gsub(pattern, "%2");
 			
 		    local sharedMem = ngx.shared.sharedMem;
 	     	local reqCount = sharedMem:get("reqCount");
@@ -117,7 +142,7 @@ elseif fork == "reqLimit" then
 
 			if confReqCount >= reqCount then
 			    sharedMem:set("reqCount", reqCount);
-				ngx.redirect(pageAddr);
+				pageAddr = _pageAddr;
 				break;
 			end;
 
@@ -128,3 +153,6 @@ elseif fork == "reqLimit" then
 end;
 
 file:close();
+
+red:set(ngx.var.remote_addr, pageAddr);
+ngx.redirect(pageAddr);
