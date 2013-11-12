@@ -4,6 +4,13 @@ local weightRules = {};
 local weightSum = 0;
 local remote_addr = ngx.var.remote_addr;
 --------------------------------- initial  --------------------------------------------
+local cachePageAddr = ngx.var.cookie_cachePageAddr;
+if cachePageAddr ~= nil then
+ 	ngx.redirect(cachePageAddr);
+	return;
+end;
+
+--[[
 local redis = require "resty.redis";
 local red = redis:new();
 
@@ -26,7 +33,7 @@ if red:exists(remote_addr) == 1 then
 	--ngx.say(cachePageAddr);
 	return;
 end;
-
+]]
 
 
 --------------------------------- function --------------------------------------------
@@ -154,5 +161,6 @@ end;
 
 file:close();
 
-red:set(ngx.var.remote_addr, pageAddr);
+ngx.header["Set-Cookie"] = "cachePageAddr=" .. pageAddr;
+--red:set(ngx.var.remote_addr, pageAddr);
 ngx.redirect(pageAddr);
