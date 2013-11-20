@@ -177,10 +177,42 @@ _M.rotePage = function(locationName)
 	local redirectPage = fn(locationConfig);
 	ngx.say(redirectPage);
 
+	local redis = require "resty.redis";
+	local red = redis:new();
+
+	red:set_timeout(1000) -- 1 second
+	local ok, err = red:connect("127.0.0.1", 6379)
+	if not ok then
+		ngx.log(ngx.ERR, "failed to connect to redis: ", err);
+		return ngx.exit(500);
+	end;
+
+	local siegeResultKey = "n3r.ab.siege.result." .. locationName;
+	local siegeResult = nil;
+	if red:exists(siegeResultKey) == 1 then
+		local siegeResultStr, err = red:get(siegeResultKey);
+		if not siegeResultStr then
+			ngx.log(ngx.ERR, "failed to get redis key: " .. siegeResultKey, err);
+			return ngx.exit(500);
+		end;
+
+		local cjson = require "cjson";
+		siegeResult = cjson.decode(siegeResultStr);
+		local count = siegeResult[redirectPage];
+		siegeResult[redirectPage] = count ~= nil and count + 1 or 1;
+	else
+		siegeResult = {};
+		siegeResult[redirectPage] = 1;
+	end;
+	
+	local siegeResultStr = cjson.encode(siegeResult);
+	red:set(siegeResultKey, siegeResultStr);
 end;
 
 _M.redirect = function(locationName)
 	ngx.say(locationName);
+
+
 	return locationName;
 end;
 
