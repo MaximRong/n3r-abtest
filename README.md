@@ -44,7 +44,9 @@ n3r-abtest工程是用来做ab测试使用的，该工程使用lua脚本编写，嵌入到nginx。
    2). 在对应需要使用ab测试的location 中配置lua脚本，实现方式可以参照上面的示例。
        在retePage中传入的参数为当前的location name
    
-   3). 配置redis,在redis中增加ab测试对应的key,目前支持三种配置，分别是根据ip分流、根据权重分流、根据流量分流，三种配置示例如下：
+   3). 配置redis,在redis中增加ab测试对应的key,key生成规则为n3r.ab.localtion.$locationName$
+
+   4). redis配置分流跳转规则,目前支持三种配置，分别是根据ip分流、根据权重分流、根据流量分流，三种配置示例如下：
     根据ip分流配置
    ```redis
 	{
@@ -75,3 +77,30 @@ n3r-abtest工程是用来做ab测试使用的，该工程使用lua脚本编写，嵌入到nginx。
 	}
    ```
    使用流量分流，method为"flow"，rule 配置为 限定流量访问次数 ： 对应页面， default为超过设置好的限定流量跳转的默认页面。
+
+  3. splitFlow.rotePage("localtionName") 会根据配置返回对应跳转页面，可以再lua 或者 ngixn中实现跳转。
+
+压力测试:
+-----------
+
+1. 将SeigeResult.lua脚本放入到nginx配置的lua库中。(放在n3r文件夹下)
+
+2. 在nginx.conf中加入如下配置:
+   ```nginx
+    location /SiegeResult {
+            default_type text/html;
+            content_by_lua '
+				local seigeResult = require "n3r.SeigeResult";
+				seigeResult.result();
+            ';
+        }
+   ```
+
+3. 调用siege访问需要测试的页面，比如 siege http://ip:port/abtest -c 5 -r 5
+
+4. 调用 http://ip:port/SiegeResult 查看压力测试结果。
+   
+> localName is : abtest 
+> page	count
+> html/three.html 29
+> html/two.html 2
