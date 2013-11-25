@@ -3,18 +3,11 @@ local _M = {
 
 	_VERSION = '0.1'
 }
-local remote_addr = ngx.var.remote_addr;
+local remote_addr = ngx.var.remote_addr; -- Òª¸Ä³Éx-forwarded-for
 local functionM = {};
 
 --------------------------------- function --------------------------------------------
-local addressNo = function(address)
-	local pattern = "^(%d+)%.(%d+)%.(%d+)%.(%d+)$";
-	local no1 = tonumber((address:gsub(pattern, "%1"))) * 1000000000;
-	local no2 = tonumber((address:gsub(pattern, "%2"))) * 1000000;
-	local no3 = tonumber((address:gsub(pattern, "%3"))) * 1000;
-	local no4 = tonumber((address:gsub(pattern, "%4")));
-	return no1 + no2 + no3 + no4;
-end;
+local n3rCommonFn = require "n3r.N3rCommonFn";
 
 local loadLocationConfig = function(locationName)
 	local locationConfig = abConfigCache[locationName];
@@ -63,8 +56,8 @@ local loadLocationConfig = function(locationName)
 			else
 				rule['type'] = 1; -- min/max ip type
 				local pattern = "^(%d+%.%d+%.%d+%.%d+)-(%d+%.%d+%.%d+%.%d+)$";
-				local min = addressNo(key:gsub(pattern, "%1"));
-				local max = addressNo(key:gsub(pattern, "%2"));
+				local min = n3rCommonFn.addressNo(key:gsub(pattern, "%1"));
+				local max = n3rCommonFn.addressNo(key:gsub(pattern, "%2"));
 				rule['min'] = min;
 				rule['max'] = max;
 			end;
@@ -104,9 +97,10 @@ local loadLocationConfig = function(locationName)
 	return locationConfig;
 end;
 
+
 local ipSplitFlowFn = function(locationConfig)
 	local loadLocationRules = locationConfig["rules"];
-	local remoteInt = addressNo(remote_addr);
+	local remoteInt = n3rCommonFn.addressNo(remote_addr);
 	local defaultPage = nil;
 	local redirect = nil;
 
@@ -159,18 +153,8 @@ functionM["flow"] = flowSplitFlowFn;
 
 _M.rotePage = function(locationName)
 
-	local locationConfig = loadLocationConfig(locationName);
-	--	for key, value in pairs(locationConfig) do
-	--		if key == 'rules' then
-	--			for i, v in ipairs(value) do
-	--				for j, k in pairs(v) do
-	--					ngx.say("rule name is: " .. j .. " ; value is: " .. k);
-	--				end;
-	--			end;
-	--		else
-	--			ngx.say("key name is: " .. key .. " ; value is: " .. value);
-	--		end;
-	--	end;
+--	local locationConfig = loadLocationConfig(locationName);
+	local locationConfig = abConfigCache[locationName];
 
 	local method = locationConfig["method"];
 	local fn = functionM[method];

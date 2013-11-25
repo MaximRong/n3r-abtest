@@ -1,0 +1,6 @@
+[{
+  "location" : "abtest",
+  "method": "flow",
+  "testMode": "false",
+  "rule": "{\"2\":\"html/two.html\",\"default\":\"html/three.html\"}"
+}]
