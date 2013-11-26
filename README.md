@@ -41,7 +41,7 @@ n3r-abtest工程是用来做ab测试使用的，该工程使用lua脚本编写，嵌入到nginx。
 		abConfigCache = {};
 		    ';
    ```
-   2). 配置文件说明
+   2). 配置文件说明 (N3rSplitFlowConfig.lua)
    ```lua
 	local _Config = {
 	["redisHost"] = "127.0.0.1",
@@ -127,9 +127,9 @@ n3r-abtest工程是用来做ab测试使用的，该工程使用lua脚本编写，嵌入到nginx。
 
    使用流量分流，method为"flow"，rule 配置为 限定流量访问次数 = 对应页面， default为超过设置好的限定流量跳转的默认页面。
 
-  3. splitFlow.rotePage("localtionName") 会根据配置返回对应跳转页面，可以再lua 或者 ngixn中实现跳转。
+3. splitFlow.rotePage("localtionName") 会根据配置返回对应跳转页面，可以再lua 或者 ngixn中实现跳转。
 
-  4. 如果testMode为 false时， 不启动测试模式， 页面会记录用户访问记录，永远访问之前登陆的页面，并且不记录统计数据。
+4. 如果testMode为 false时， 不启动测试模式， 页面会记录用户访问记录，永远访问之前登陆的页面，并且不记录统计数据。
 
 压力测试:
 -----------
