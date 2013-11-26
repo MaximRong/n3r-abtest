@@ -1,16 +1,17 @@
 --------------------------------- variable --------------------------------------------
 local _M = {
-
 	_VERSION = '0.1'
 }
-local remote_addr = ngx.var.remote_addr; -- 要改成x-forwarded-for
+
 local functionM = {};
 local n3rCommonFn = require "n3r.N3rCommonFn";
 local n3rSplitFlowConfig = require "n3r.N3rSplitFlowConfig";
+local cjson = require "cjson";
 
 --------------------------------- function --------------------------------------------
 
 local ipSplitFlowFn = function(locationConfig)
+	local remote_addr = ngx.var.remote_addr; -- 要改成x-forwarded-for
 	local loadLocationRules = locationConfig["rules"];
 	local remoteInt = n3rCommonFn.addressNo(remote_addr);
 	local defaultPage = nil;
@@ -58,7 +59,7 @@ local flowSplitFlowFn = function(locationConfig)
 	local sum = locationConfig["param"];
 	local loadLocationRules = locationConfig["rules"];
 
-	if randomNum <= flowLimitRate and limitTime >= sum then
+	if randomNum <= flowLimitRate and limitTime > sum then
 		sum = sum + 1;
 		locationConfig["param"] = sum;
 		return loadLocationRules["redirectPage"];
@@ -71,22 +72,10 @@ functionM["ip"] = ipSplitFlowFn;
 functionM["weight"] = weightSplitFlowFn;
 functionM["flow"] = flowSplitFlowFn;
 
-_M.rotePage = function(locationName)
-
-	local locationConfig = abConfigCache[locationName];
-	if not locationConfig then
-		ngx.log(ngx.ERR, "location name not found : ", locationName);
-		return ngx.exit(500);
-	end;
-
-	local method = locationConfig["method"];
-	local fn = functionM[method];
-	local redirectPage = fn(locationConfig);
-	ngx.say(redirectPage);
-
+local recordRedirectPage = function(locationName, redirectPage)
 	local redis = require "resty.redis";
 	local red = redis:new();
-
+	
 	red:set_timeout(1000) -- 1 second
 	local redisHost, redisPort = n3rSplitFlowConfig.redisConfig();
 	local ok, err = red:connect(redisHost, redisPort)
@@ -94,7 +83,7 @@ _M.rotePage = function(locationName)
 		ngx.log(ngx.ERR, "failed to connect to redis: ", err);
 		return ngx.exit(500);
 	end;
-
+	
 	local siegeResultKey = "n3r.ab.siege.result." .. locationName;
 	local siegeResult = nil;
 	if red:exists(siegeResultKey) == 1 then
@@ -104,7 +93,6 @@ _M.rotePage = function(locationName)
 			return ngx.exit(500);
 		end;
 
-		local cjson = require "cjson";
 		siegeResult = cjson.decode(siegeResultStr);
 		local count = siegeResult[redirectPage];
 		siegeResult[redirectPage] = count ~= nil and count + 1 or 1;
@@ -112,9 +100,34 @@ _M.rotePage = function(locationName)
 		siegeResult = {};
 		siegeResult[redirectPage] = 1;
 	end;
-
 	local siegeResultStr = cjson.encode(siegeResult);
 	red:set(siegeResultKey, siegeResultStr);
+end;
+
+_M.rotePage = function(locationName)
+
+	local locationConfig = abConfigCache[locationName];
+	if not locationConfig then
+		ngx.log(ngx.ERR, "location name not found : ", locationName);
+		return ngx.exit(500);
+	end;
+	
+	local cachePageAddr = ngx.var.cookie_cachePageAddr;
+	local testMode = n3rCommonFn.booleanValue(locationConfig["testMode"]);
+	if not testMode and cachePageAddr ~= nil then
+		return cachePageAddr;
+	end;
+
+	local method = locationConfig["method"];
+	local fn = functionM[method];
+	local redirectPage = fn(locationConfig);
+	ngx.header["Set-Cookie"] = "cachePageAddr=" .. redirectPage;
+	
+	if testMode then
+		recordRedirectPage(locationName, redirectPage);
+	end;
+	
+	return redirectPage;
 end;
 
 _M.redirect = function(locationName)

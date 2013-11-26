@@ -12,4 +12,13 @@ _M.addressNo = function(address)
 	return no1 + no2 + no3 + no4;
 end;
 
+_M.booleanValue = function(str)
+	if str == "yes" or str == "true" or str == "on" or str == true then
+		return true;
+	end;
+
+	return false;
+end;
+
+
 return _M;

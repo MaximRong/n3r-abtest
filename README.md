@@ -41,44 +41,95 @@ n3r-abtest工程是用来做ab测试使用的，该工程使用lua脚本编写，嵌入到nginx。
 		abConfigCache = {};
 		    ';
    ```
-   2). 在对应需要使用ab测试的location 中配置lua脚本，实现方式可以参照上面的示例。
-       在retePage中传入的参数为当前的location name
-   
-   3). 配置redis,在redis中增加ab测试对应的key,key生成规则为n3r.ab.localtion.$locationName$
+   2). 配置文件说明
+   ```lua
+	local _Config = {
+	["redisHost"] = "127.0.0.1",
+	["redisPort"] = 6379,
+	["flowLimitRate"] = "30%",
 
-   4). redis配置分流跳转规则,目前支持三种配置，分别是根据ip分流、根据权重分流、根据流量分流，三种配置示例如下：
-    根据ip分流配置
-   ```redis
-	{
-	  "method": "ip",
-	  "testMode": "false",
-	  "rule": "{\"192.168.0.1-192.168.2.1\":\"html/one.html\",\"192.168.126.4-192.168.126.5\":\"html/two.html\",\"default\":\"html/three.html\"}"
+
+
+	["splitRules"] = {
+		-- locationName abtest rule
+		{
+			["locationName"] = "abtest",
+			["method"] = "flow",
+			["testMode"] = true,
+			["rule"] = {
+				["2"] = "html/two.html",
+				["default"] = "html/three.html",
+			}
+		},
+
+		-- flow Limit Config
+		{
+			["locationName"] = "flowLimitConfig",
+			["method"] = "flow",
+			["testMode"] = false,
+			["rule"] = {
+				["2"] = "html/two.html",
+				["default"] = "html/three.html",
+			}
+		},
+
+		-- weight Config
+		{
+			["locationName"] = "weightConfig",
+			["method"] = "weight",
+			["testMode"] = false,
+			["rule"] = {
+				["20%"] = "html/one.html",
+				["40%"] = "html/two.html",
+				["default"] = "html/three.html"
+			}
+		},
+
+		-- ip Config
+		{
+			["locationName"] = "ipConfig",
+			["method"] = "ip",
+			["testMode"] = true,
+			["rule"] = {
+				["192.168.0.1-192.168.2.1"] = "html/one.html",
+				["192.168.126.4-192.168.126.5"] = "html/two.html",
+				["default"] = "html/three.html"
+			}
+		}
 	}
+}
    ```
+
+   redisHost : redis对应的Host
+   redisPort : redis对应的Port
+   flowLimitRate : 如果规则是限流规则时，访问限流页面随机率
+   splitRules : 配置规则，可以配置多个规则，根据不同的locationName来区分
+
+   ```lua
+   {
+			["locationName"] = "abtest",
+			["method"] = "flow",
+			["testMode"] = true,
+			["rule"] = {
+				["2"] = "html/two.html",
+				["default"] = "html/three.html",
+			}
+		}
+   ```
+   locationName 对应key名，在后面调用splitFlow时候需要用到
+   method 分流的方法，对应有ip、flow、weight三种
+   testMode 是否测试模式 false为非测试模式 true为测试模式
+   rule 对应规则:
    使用根据ip分流，method必须为"ip"， testMode是测试模式是否打开。rule是对应规则，是一个json字符串。
    rule json key 为起始ip-终止ip ， 值为对应页面， 起始ip地址要小于终止ip。 default key 是配置默认跳转页面。
 
-    根据权重分流配置
-   ```redis
-	{
-	  "method": "weight",
-	  "testMode": "false",
-	  "rule": "{\"1\":\"html/one.html\",\"2\":\"html/two.html\",\"3\":\"html/three.html\"}"
-	}
-   ```
-   使用权重分流，method为"weight"，rule 配置为 对应权重 ： 对应页面。
+   使用权重分流，method为"weight"，rule 配置为 对应权重 = 对应页面, default对应默认跳转页面
 
-    根据流量分流配置
-   ```redis
-	{
-	  "method": "flow",
-	  "testMode": "false",
-	  "rule": "{\"2\":\"html/two.html\",\"default\":\"html/three.html\"}"
-	}
-   ```
-   使用流量分流，method为"flow"，rule 配置为 限定流量访问次数 ： 对应页面， default为超过设置好的限定流量跳转的默认页面。
+   使用流量分流，method为"flow"，rule 配置为 限定流量访问次数 = 对应页面， default为超过设置好的限定流量跳转的默认页面。
 
   3. splitFlow.rotePage("localtionName") 会根据配置返回对应跳转页面，可以再lua 或者 ngixn中实现跳转。
+
+  4. 如果testMode为 false时， 不启动测试模式， 页面会记录用户访问记录，永远访问之前登陆的页面，并且不记录统计数据。
 
 压力测试:
 -----------

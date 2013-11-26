@@ -10,7 +10,7 @@ local _Config = {
 		{
 			["locationName"] = "abtest",
 			["method"] = "flow",
-			["testMode"] = "false",
+			["testMode"] = true,
 			["rule"] = {
 				["2"] = "html/two.html",
 				["default"] = "html/three.html",
@@ -21,7 +21,7 @@ local _Config = {
 		{
 			["locationName"] = "flowLimitConfig",
 			["method"] = "flow",
-			["testMode"] = "false",
+			["testMode"] = false,
 			["rule"] = {
 				["2"] = "html/two.html",
 				["default"] = "html/three.html",
@@ -32,7 +32,7 @@ local _Config = {
 		{
 			["locationName"] = "weightConfig",
 			["method"] = "weight",
-			["testMode"] = "false",
+			["testMode"] = false,
 			["rule"] = {
 				["20%"] = "html/one.html",
 				["40%"] = "html/two.html",
@@ -44,7 +44,7 @@ local _Config = {
 		{
 			["locationName"] = "ipConfig",
 			["method"] = "ip",
-			["testMode"] = "true",
+			["testMode"] = true,
 			["rule"] = {
 				["192.168.0.1-192.168.2.1"] = "html/one.html",
 				["192.168.126.4-192.168.126.5"] = "html/two.html",
