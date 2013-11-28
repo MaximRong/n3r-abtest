@@ -1,54 +1,54 @@
 local _Config = {
-	["redisHost"] = "127.0.0.1",
-	["redisPort"] = 6379,
-	["flowLimitRate"] = "30%",
+	redisHost = "127.0.0.1",
+	redisPort = 6379,
+	flowLimitRate = "30%",
 
 
 
-	["splitRules"] = {
+	splitRules = {
 		-- locationName abtest rule
 		{
-			["locationName"] = "abtest",
-			["method"] = "flow",
-			["testMode"] = true,
-			["rule"] = {
-				["2"] = "html/two.html",
-				["default"] = "html/three.html",
+			locationName = "abtest",
+			method = "flow",
+			testMode = true,
+			rule = {
+				[2] = "html/two.html",
+				default = "html/three.html",
 			}
 		},
 
 		-- flow Limit Config
 		{
-			["locationName"] = "flowLimitConfig",
-			["method"] = "flow",
-			["testMode"] = false,
-			["rule"] = {
-				["2"] = "html/two.html",
-				["default"] = "html/three.html",
+			locationName = "flowLimitConfig",
+			method = "flow",
+			testMode = false,
+			rule = {
+				[2] = "html/two.html",
+				default = "html/three.html",
 			}
 		},
 
 		-- weight Config
 		{
-			["locationName"] = "weightConfig",
-			["method"] = "weight",
-			["testMode"] = false,
-			["rule"] = {
+			locationName = "weightConfig",
+			method = "weight",
+			testMode = false,
+			rule = {
 				["20%"] = "html/one.html",
 				["40%"] = "html/two.html",
-				["default"] = "html/three.html"
+				default = "html/three.html"
 			}
 		},
 
 		-- ip Config
 		{
-			["locationName"] = "ipConfig",
-			["method"] = "ip",
-			["testMode"] = true,
-			["rule"] = {
+			locationName = "ipConfig",
+			method = "ip",
+			testMode = true,
+			rule = {
 				["192.168.0.1-192.168.2.1"] = "html/one.html",
 				["192.168.126.4-192.168.126.5"] = "html/two.html",
-				["default"] = "html/three.html"
+				default = "html/three.html"
 			}
 		}
 	}
@@ -92,7 +92,7 @@ _Config.splitRule = function(locationName)
 end;
 
 local function main()
-	print(_Config.getFlowLimitRateNumber());
+	print(_Config.redisConfig());
 end
---main();
-return _Config;
+main();
+--return _Config;

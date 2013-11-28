@@ -34,70 +34,74 @@ n3r-abtest工程是用来做ab测试使用的，该工程使用lua脚本编写，嵌入到nginx。
 ---------
 
 1. 将SplitFlow.lua脚本放入到nginx配置的lua库中。(放在n3r文件夹下)
+
 2. 配置nginx.conf 
+   
    1). 在http里，所有server外面增加一个初始化配置，用于设定全局变量。
    ```nginx
 	init_by_lua '
-		abConfigCache = {};
+		local SplitFlowInit = require "n3r.SplitFlowInit";
+		abConfigCache = SplitFlowInit.init();
 		    ';
    ```
+
    2). 配置文件说明 (N3rSplitFlowConfig.lua)
    ```lua
 	local _Config = {
-	["redisHost"] = "127.0.0.1",
-	["redisPort"] = 6379,
-	["flowLimitRate"] = "30%",
+		redisHost = "127.0.0.1",
+		redisPort = 6379,
+		flowLimitRate = "30%",
 
 
 
-	["splitRules"] = {
-		-- locationName abtest rule
-		{
-			["locationName"] = "abtest",
-			["method"] = "flow",
-			["testMode"] = true,
-			["rule"] = {
-				["2"] = "html/two.html",
-				["default"] = "html/three.html",
-			}
-		},
+		splitRules = {
+			-- locationName abtest rule
+			{
+				locationName = "abtest",
+				method = "flow",
+				testMode = true,
+				rule = {
+					[2] = "html/two.html",
+					default = "html/three.html",
+				}
+			},
 
-		-- flow Limit Config
-		{
-			["locationName"] = "flowLimitConfig",
-			["method"] = "flow",
-			["testMode"] = false,
-			["rule"] = {
-				["2"] = "html/two.html",
-				["default"] = "html/three.html",
-			}
-		},
+			-- flow Limit Config
+			{
+				locationName = "flowLimitConfig",
+				method = "flow",
+				testMode = false,
+				rule = {
+					[2] = "html/two.html",
+					default = "html/three.html",
+				}
+			},
 
-		-- weight Config
-		{
-			["locationName"] = "weightConfig",
-			["method"] = "weight",
-			["testMode"] = false,
-			["rule"] = {
-				["20%"] = "html/one.html",
-				["40%"] = "html/two.html",
-				["default"] = "html/three.html"
-			}
-		},
+			-- weight Config
+			{
+				locationName = "weightConfig",
+				method = "weight",
+				testMode = false,
+				rule = {
+					["20%"] = "html/one.html",
+					["40%"] = "html/two.html",
+					default = "html/three.html"
+				}
+			},
 
-		-- ip Config
-		{
-			["locationName"] = "ipConfig",
-			["method"] = "ip",
-			["testMode"] = true,
-			["rule"] = {
-				["192.168.0.1-192.168.2.1"] = "html/one.html",
-				["192.168.126.4-192.168.126.5"] = "html/two.html",
-				["default"] = "html/three.html"
+			-- ip Config
+			{
+				locationName = "ipConfig",
+				method = "ip",
+				testMode = true,
+				rule = {
+					["192.168.0.1-192.168.2.1"] = "html/one.html",
+					["192.168.126.4-192.168.126.5"] = "html/two.html",
+					default = "html/three.html"
+				}
 			}
 		}
 	}
-}
    ```
 
    redisHost : redis对应的Host
@@ -106,15 +110,15 @@ n3r-abtest工程是用来做ab测试使用的，该工程使用lua脚本编写，嵌入到nginx。
    splitRules : 配置规则，可以配置多个规则，根据不同的locationName来区分
 
    ```lua
-   {
-			["locationName"] = "abtest",
-			["method"] = "flow",
-			["testMode"] = true,
-			["rule"] = {
-				["2"] = "html/two.html",
-				["default"] = "html/three.html",
-			}
-		}
+	  		 {
+				locationName = "abtest",
+				method = "flow",
+				testMode = true,
+				rule = {
+					[2] = "html/two.html",
+					default = "html/three.html",
+				}
+			},
    ```
    locationName 对应key名，在后面调用splitFlow时候需要用到
    method 分流的方法，对应有ip、flow、weight三种
