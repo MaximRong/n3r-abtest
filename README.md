@@ -1,9 +1,9 @@
 n3r-abtest
 ==========
 
-n3r-abtest¹¤³ÌÊÇÓÃÀ´×öab²âÊÔÊ¹ÓÃµÄ£¬¸Ã¹¤³ÌÊ¹ÓÃlua½Å±¾±àĞ´£¬Ç¶Èëµ½nginx¡£
+n3r-abtestå·¥ç¨‹æ˜¯ç”¨æ¥åšabæµ‹è¯•ä½¿ç”¨çš„ï¼Œè¯¥å·¥ç¨‹ä½¿ç”¨luaè„šæœ¬ç¼–å†™ï¼ŒåµŒå…¥åˆ°nginxã€‚
 
-¼òµ¥Ê¾Àı:
+ç®€å•ç¤ºä¾‹:
 ---------
 
 ```nginx
@@ -19,25 +19,25 @@ n3r-abtest¹¤³ÌÊÇÓÃÀ´×öab²âÊÔÊ¹ÓÃµÄ£¬¸Ã¹¤³ÌÊ¹ÓÃlua½Å±¾±àĞ´£¬Ç¶Èëµ½nginx¡£
    }
 ```
 
-ÔÚnginxÅäÖÃÖĞÒıÈë"n3r.SplitFlow"£¬µ÷ÓÃrotePage·½·¨(²ÎÊıÎªµ±Ç°µÄlocation name)£¬¼´¿É·µ»Ø¶ÔÓ¦µÄÒ³Ãæ
-¿ÉÒÔÑ¡ÔñÊ¹ÓÃlua½Å±¾Ìø×ªµ½¶ÔÓ¦Ò³Ãæ£¬Ò²¿ÉÒÔÊ¹ÓÃnginx×ÔĞĞÌø×ª¡£
+åœ¨nginxé…ç½®ä¸­å¼•å…¥"n3r.SplitFlow"ï¼Œè°ƒç”¨rotePageæ–¹æ³•(å‚æ•°ä¸ºå½“å‰çš„location name)ï¼Œå³å¯è¿”å›å¯¹åº”çš„é¡µé¢
+å¯ä»¥é€‰æ‹©ä½¿ç”¨luaè„šæœ¬è·³è½¬åˆ°å¯¹åº”é¡µé¢ï¼Œä¹Ÿå¯ä»¥ä½¿ç”¨nginxè‡ªè¡Œè·³è½¬ã€‚
 
-»·¾³ÒªÇó:
+ç¯å¢ƒè¦æ±‚:
 ---------
 
-1. redis ÄÚ´æÊı¾İ¿â ÓÃÓÚ¼ÇÂ¼ab²âÊÔÏà¹ØÅäÖÃ download : [http://redis.io/](http://redis.io/)
-2. nginx ·şÎñÆ÷ ab²âÊÔÔÚnginx²ã×öÌø×ª download : [http://nginx.org/en/download.html](http://nginx.org/en/download.html)
-3. lua ½Å±¾ÓïÑÔ£¬ab²âÊÔ±àĞ´ÓïÑÔ (×¢ : ÑĞ·¢Ê±Ê¹ÓÃµÄÊÇopenresty£¬ÅäÖÃÉÏÏßÇë²¿ÊğÏà¹ØnginxÖ§³Ölua»·¾³) download : [http://openresty.org/](http://openresty.org/)
-4. siege Ñ¹Á¦²âÊÔ¹¤¾ß£¬Ê¹ÓÃ¼òµ¥ download : [http://www.joedog.org/siege-home/](http://www.joedog.org/siege-home/)
+1. redis å†…å­˜æ•°æ®åº“ ç”¨äºè®°å½•abæµ‹è¯•ç›¸å…³é…ç½® download : [http://redis.io/](http://redis.io/)
+2. nginx æœåŠ¡å™¨ abæµ‹è¯•åœ¨nginxå±‚åšè·³è½¬ download : [http://nginx.org/en/download.html](http://nginx.org/en/download.html)
+3. lua è„šæœ¬è¯­è¨€ï¼Œabæµ‹è¯•ç¼–å†™è¯­è¨€ (æ³¨ : ç ”å‘æ—¶ä½¿ç”¨çš„æ˜¯openrestyï¼Œé…ç½®ä¸Šçº¿è¯·éƒ¨ç½²ç›¸å…³nginxæ”¯æŒluaç¯å¢ƒ) download : [http://openresty.org/](http://openresty.org/)
+4. siege å‹åŠ›æµ‹è¯•å·¥å…·ï¼Œä½¿ç”¨ç®€å• download : [http://www.joedog.org/siege-home/](http://www.joedog.org/siege-home/)
 
-²¿Êğ½éÉÜ:
+éƒ¨ç½²ä»‹ç»:
 ---------
 
-1. ½«SplitFlow.lua½Å±¾·ÅÈëµ½nginxÅäÖÃµÄlua¿âÖĞ¡£(·ÅÔÚn3rÎÄ¼ş¼ĞÏÂ)
+1. å°†SplitFlow.luaè„šæœ¬æ”¾å…¥åˆ°nginxé…ç½®çš„luaåº“ä¸­ã€‚(æ”¾åœ¨n3ræ–‡ä»¶å¤¹ä¸‹)
 
-2. ÅäÖÃnginx.conf 
+2. é…ç½®nginx.conf 
    
-   1). ÔÚhttpÀï£¬ËùÓĞserverÍâÃæÔö¼ÓÒ»¸ö³õÊ¼»¯ÅäÖÃ£¬ÓÃÓÚÉè¶¨È«¾Ö±äÁ¿¡£
+   1). åœ¨httpé‡Œï¼Œæ‰€æœ‰serverå¤–é¢å¢åŠ ä¸€ä¸ªåˆå§‹åŒ–é…ç½®ï¼Œç”¨äºè®¾å®šå…¨å±€å˜é‡ã€‚
    ```nginx
 	init_by_lua '
 		local SplitFlowInit = require "n3r.SplitFlowInit";
@@ -45,7 +45,7 @@ n3r-abtest¹¤³ÌÊÇÓÃÀ´×öab²âÊÔÊ¹ÓÃµÄ£¬¸Ã¹¤³ÌÊ¹ÓÃlua½Å±¾±àĞ´£¬Ç¶Èëµ½nginx¡£
 		    ';
    ```
 
-   2). ÅäÖÃÎÄ¼şËµÃ÷ (N3rSplitFlowConfig.lua)
+   2). é…ç½®æ–‡ä»¶è¯´æ˜ (N3rSplitFlowConfig.lua)
    ```lua
 	local _Config = {
 		redisHost = "127.0.0.1",
@@ -104,13 +104,13 @@ n3r-abtest¹¤³ÌÊÇÓÃÀ´×öab²âÊÔÊ¹ÓÃµÄ£¬¸Ã¹¤³ÌÊ¹ÓÃlua½Å±¾±àĞ´£¬Ç¶Èëµ½nginx¡£
 	}
    ```
 
-   redisHost : redis¶ÔÓ¦µÄHost
-   redisPort : redis¶ÔÓ¦µÄPort
-   flowLimitRate : Èç¹û¹æÔòÊÇÏŞÁ÷¹æÔòÊ±£¬·ÃÎÊÏŞÁ÷Ò³ÃæËæ»úÂÊ
-   splitRules : ÅäÖÃ¹æÔò£¬¿ÉÒÔÅäÖÃ¶à¸ö¹æÔò£¬¸ù¾İ²»Í¬µÄlocationNameÀ´Çø·Ö
+   redisHost : rediså¯¹åº”çš„Host
+   redisPort : rediså¯¹åº”çš„Port
+   flowLimitRate : å¦‚æœè§„åˆ™æ˜¯é™æµè§„åˆ™æ—¶ï¼Œè®¿é—®é™æµé¡µé¢éšæœºç‡
+   splitRules : é…ç½®è§„åˆ™ï¼Œå¯ä»¥é…ç½®å¤šä¸ªè§„åˆ™ï¼Œæ ¹æ®ä¸åŒçš„locationNameæ¥åŒºåˆ†
 
    ```lua
-	  		 {
+	   {
 				locationName = "abtest",
 				method = "flow",
 				testMode = true,
@@ -120,27 +120,27 @@ n3r-abtest¹¤³ÌÊÇÓÃÀ´×öab²âÊÔÊ¹ÓÃµÄ£¬¸Ã¹¤³ÌÊ¹ÓÃlua½Å±¾±àĞ´£¬Ç¶Èëµ½nginx¡£
 				}
 			},
    ```
-   locationName ¶ÔÓ¦keyÃû£¬ÔÚºóÃæµ÷ÓÃsplitFlowÊ±ºòĞèÒªÓÃµ½
-   method ·ÖÁ÷µÄ·½·¨£¬¶ÔÓ¦ÓĞip¡¢flow¡¢weightÈıÖÖ
-   testMode ÊÇ·ñ²âÊÔÄ£Ê½ falseÎª·Ç²âÊÔÄ£Ê½ trueÎª²âÊÔÄ£Ê½
-   rule ¶ÔÓ¦¹æÔò:
-   Ê¹ÓÃ¸ù¾İip·ÖÁ÷£¬method±ØĞëÎª"ip"£¬ testModeÊÇ²âÊÔÄ£Ê½ÊÇ·ñ´ò¿ª¡£ruleÊÇ¶ÔÓ¦¹æÔò£¬ÊÇÒ»¸öjson×Ö·û´®¡£
-   rule json key ÎªÆğÊ¼ip-ÖÕÖ¹ip £¬ ÖµÎª¶ÔÓ¦Ò³Ãæ£¬ ÆğÊ¼ipµØÖ·ÒªĞ¡ÓÚÖÕÖ¹ip¡£ default key ÊÇÅäÖÃÄ¬ÈÏÌø×ªÒ³Ãæ¡£
+   locationName å¯¹åº”keyåï¼Œåœ¨åé¢è°ƒç”¨splitFlowæ—¶å€™éœ€è¦ç”¨åˆ°
+   method åˆ†æµçš„æ–¹æ³•ï¼Œå¯¹åº”æœ‰ipã€flowã€weightä¸‰ç§
+   testMode æ˜¯å¦æµ‹è¯•æ¨¡å¼ falseä¸ºéæµ‹è¯•æ¨¡å¼ trueä¸ºæµ‹è¯•æ¨¡å¼
+   rule å¯¹åº”è§„åˆ™:
+   ä½¿ç”¨æ ¹æ®ipåˆ†æµï¼Œmethodå¿…é¡»ä¸º"ip"ï¼Œ testModeæ˜¯æµ‹è¯•æ¨¡å¼æ˜¯å¦æ‰“å¼€ã€‚ruleæ˜¯å¯¹åº”è§„åˆ™ï¼Œæ˜¯ä¸€ä¸ªjsonå­—ç¬¦ä¸²ã€‚
+   rule json key ä¸ºèµ·å§‹ip-ç»ˆæ­¢ip ï¼Œ å€¼ä¸ºå¯¹åº”é¡µé¢ï¼Œ èµ·å§‹ipåœ°å€è¦å°äºç»ˆæ­¢ipã€‚ default key æ˜¯é…ç½®é»˜è®¤è·³è½¬é¡µé¢ã€‚
 
-   Ê¹ÓÃÈ¨ÖØ·ÖÁ÷£¬methodÎª"weight"£¬rule ÅäÖÃÎª ¶ÔÓ¦È¨ÖØ = ¶ÔÓ¦Ò³Ãæ, default¶ÔÓ¦Ä¬ÈÏÌø×ªÒ³Ãæ
+   ä½¿ç”¨æƒé‡åˆ†æµï¼Œmethodä¸º"weight"ï¼Œrule é…ç½®ä¸º å¯¹åº”æƒé‡ = å¯¹åº”é¡µé¢, defaultå¯¹åº”é»˜è®¤è·³è½¬é¡µé¢
 
-   Ê¹ÓÃÁ÷Á¿·ÖÁ÷£¬methodÎª"flow"£¬rule ÅäÖÃÎª ÏŞ¶¨Á÷Á¿·ÃÎÊ´ÎÊı = ¶ÔÓ¦Ò³Ãæ£¬ defaultÎª³¬¹ıÉèÖÃºÃµÄÏŞ¶¨Á÷Á¿Ìø×ªµÄÄ¬ÈÏÒ³Ãæ¡£
+   ä½¿ç”¨æµé‡åˆ†æµï¼Œmethodä¸º"flow"ï¼Œrule é…ç½®ä¸º é™å®šæµé‡è®¿é—®æ¬¡æ•° = å¯¹åº”é¡µé¢ï¼Œ defaultä¸ºè¶…è¿‡è®¾ç½®å¥½çš„é™å®šæµé‡è·³è½¬çš„é»˜è®¤é¡µé¢ã€‚
 
-3. splitFlow.rotePage("localtionName") »á¸ù¾İÅäÖÃ·µ»Ø¶ÔÓ¦Ìø×ªÒ³Ãæ£¬¿ÉÒÔÔÙlua »òÕß ngixnÖĞÊµÏÖÌø×ª¡£
+3. splitFlow.rotePage("localtionName") ä¼šæ ¹æ®é…ç½®è¿”å›å¯¹åº”è·³è½¬é¡µé¢ï¼Œå¯ä»¥å†lua æˆ–è€… ngixnä¸­å®ç°è·³è½¬ã€‚
 
-4. Èç¹ûtestModeÎª falseÊ±£¬ ²»Æô¶¯²âÊÔÄ£Ê½£¬ Ò³Ãæ»á¼ÇÂ¼ÓÃ»§·ÃÎÊ¼ÇÂ¼£¬ÓÀÔ¶·ÃÎÊÖ®Ç°µÇÂ½µÄÒ³Ãæ£¬²¢ÇÒ²»¼ÇÂ¼Í³¼ÆÊı¾İ¡£
+4. å¦‚æœtestModeä¸º falseæ—¶ï¼Œ ä¸å¯åŠ¨æµ‹è¯•æ¨¡å¼ï¼Œ é¡µé¢ä¼šè®°å½•ç”¨æˆ·è®¿é—®è®°å½•ï¼Œæ°¸è¿œè®¿é—®ä¹‹å‰ç™»é™†çš„é¡µé¢ï¼Œå¹¶ä¸”ä¸è®°å½•ç»Ÿè®¡æ•°æ®ã€‚
 
-Ñ¹Á¦²âÊÔ:
+å‹åŠ›æµ‹è¯•:
 -----------
 
-1. ½«SeigeResult.lua½Å±¾·ÅÈëµ½nginxÅäÖÃµÄlua¿âÖĞ¡£(·ÅÔÚn3rÎÄ¼ş¼ĞÏÂ)
+1. å°†SeigeResult.luaè„šæœ¬æ”¾å…¥åˆ°nginxé…ç½®çš„luaåº“ä¸­ã€‚(æ”¾åœ¨n3ræ–‡ä»¶å¤¹ä¸‹)
 
-2. ÔÚnginx.confÖĞ¼ÓÈëÈçÏÂÅäÖÃ:
+2. åœ¨nginx.confä¸­åŠ å…¥å¦‚ä¸‹é…ç½®:
    ```nginx
     location /SiegeResult {
             default_type text/html;
@@ -151,9 +151,9 @@ n3r-abtest¹¤³ÌÊÇÓÃÀ´×öab²âÊÔÊ¹ÓÃµÄ£¬¸Ã¹¤³ÌÊ¹ÓÃlua½Å±¾±àĞ´£¬Ç¶Èëµ½nginx¡£
         }
    ```
 
-3. µ÷ÓÃsiege·ÃÎÊĞèÒª²âÊÔµÄÒ³Ãæ£¬±ÈÈç siege http://ip:port/abtest -c 5 -r 5
+3. è°ƒç”¨siegeè®¿é—®éœ€è¦æµ‹è¯•çš„é¡µé¢ï¼Œæ¯”å¦‚ siege http://ip:port/abtest -c 5 -r 5
 
-4. µ÷ÓÃ http://ip:port/SiegeResult ²é¿´Ñ¹Á¦²âÊÔ½á¹û¡£
+4. è°ƒç”¨ http://ip:port/SiegeResult æŸ¥çœ‹å‹åŠ›æµ‹è¯•ç»“æœã€‚
    
 > localName is : abtest 
 > page	count
