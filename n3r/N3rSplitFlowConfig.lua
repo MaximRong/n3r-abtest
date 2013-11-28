@@ -2,8 +2,7 @@ local _Config = {
 	redisHost = "127.0.0.1",
 	redisPort = 6379,
 	flowLimitRate = "30%",
-
-
+	
 
 	splitRules = {
 		-- locationName abtest rule

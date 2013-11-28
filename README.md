@@ -1,15 +1,17 @@
 n3r-abtest
 ==========
 
-n3r-abtest工程是用来做ab测试使用的，该工程使用lua脚本编写，嵌入到nginx。
+n3r-abtest工程是火箭队研发的用于ab测试模块。[点我了解ab测试](http://oldj.net/article/ab-testing-basic-concept/)
+使用lua语言编写，嵌入Nginx层使用。
 
 简单示例:
 ---------
 
 ```nginx
+   
+   # 假设需要做ab测试的location为 abtest
    location /abtest {
-
-    #content_by_lua_file conf/abcontroler.lua;
+   		#内容阶段使用lua执行
 		content_by_lua '
 		   ngx.header.content_type = "text/plain";
 		   local splitFlow = require "n3r.SplitFlow";
@@ -19,8 +21,12 @@ n3r-abtest工程是用来做ab测试使用的，该工程使用lua脚本编写�
    }
 ```
 
-在nginx配置中引入"n3r.SplitFlow"，调用rotePage方法(参数为当前的location name)，即可返回对应的页面
-可以选择使用lua脚本跳转到对应页面，也可以使用nginx自行跳转。
+在nginx配置中，设置content_by_lua， 表示使用lua来进行内容处理。
+设置content_type为"text/plain"
+调用lua require函数，引入n3r.SplitFlow脚本。(脚本需要放置在nginx对应的lua lib中)
+调用splitFlow对应的rotePage方法，传入参数是"location"的名称。(PS : 其实这个是一个key 但为了统一规则就确定使用location名称作为key)
+rotePage方法返回对应的路由页面，调用nginx自带的redirect函数跳转至对应页面。
+
 
 环境要求:
 ---------
