@@ -1,7 +1,7 @@
 --------------------------------- variable --------------------------------------------
 local _M = {
 	_VERSION = '0.1'
-}
+} 
 
 local functionM = {};
 local n3rCommonFn = require "n3r.N3rCommonFn";

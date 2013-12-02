@@ -91,7 +91,7 @@ _Config.splitRule = function(locationName)
 end;
 
 local function main()
-	print(_Config.redisConfig());
+	print(_Config.allSplitRules());
 end
 main();
 --return _Config;
