@@ -225,3 +225,11 @@ n3r-abtest
 > html/three.html 29 <br/>
 > html/two.html 2 <br/>
  
+
+ 测试用例:
+-----------
+
+在源代码中test文件对应的是测试用例，由于测试用例不是重点，所以简单说明一下。<br/>
+测试用例使用的是busted框架，它是一个lua测试用例框架。官方网站是：[http://olivinelabs.com/busted/](http://olivinelabs.com/busted/)<br/>
+并且需要在本机配置luaRocks，这是一个lua对应的中心仓库，通过它才能安装busted。官方网站是: [http://luarocks.org/](http://luarocks.org/)<br/>
+如果你本地环境是5.2，那么请自行编译cjson.so文件，openresty自带的cjson.so对应执行环境是5.1，因此在执行测试用例时会报不兼容。<br/>
