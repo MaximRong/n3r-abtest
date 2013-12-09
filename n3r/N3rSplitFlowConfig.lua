@@ -1,18 +1,19 @@
 local _Config = {
 	redisHost = "127.0.0.1",
 	redisPort = 6379,
-	flowLimitRate = "30%",
+	flowLimitRate = "100%",
 	
 
 	splitRules = {
 		-- locationName abtest rule
 		{
 			locationName = "abtest",
-			method = "flow",
-			testMode = true,
+			method = "os",
+			testMode = false,
 			rule = {
-				[2] = "html/two.html",
-				default = "html/three.html",
+				["Win 7"] = "html/one.html",
+				["Mac"] = "html/two.html",
+				default = "html/three.html"
 			}
 		},
 
@@ -43,10 +44,22 @@ local _Config = {
 		{
 			locationName = "ipConfig",
 			method = "ip",
-			testMode = true,
+			testMode = false,
 			rule = {
 				["192.168.0.1-192.168.2.1"] = "html/one.html",
 				["192.168.126.4-192.168.126.5"] = "html/two.html",
+				default = "html/three.html"
+			}
+		},
+		
+		-- os Config
+		{
+			locationName = "osConfig",
+			method = "os",
+			testMode = false,
+			rule = {
+				["Win 7"] = "html/one.html",
+				["Mac"] = "html/two.html",
 				default = "html/three.html"
 			}
 		}
@@ -93,5 +106,5 @@ end;
 local function main()
 	print(_Config.allSplitRules());
 end
-main();
---return _Config;
+--main();
+return _Config;

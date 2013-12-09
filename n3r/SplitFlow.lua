@@ -1,7 +1,7 @@
 --------------------------------- variable --------------------------------------------
 local _M = {
 	_VERSION = '0.1'
-} 
+}
 
 local functionM = {};
 local n3rCommonFn = require "n3r.N3rCommonFn";
@@ -68,14 +68,29 @@ local flowSplitFlowFn = function(locationConfig)
 	return loadLocationRules["defaultPage"];
 end;
 
+local osSplitFlowFn = function(locationConfig)
+
+	local os = n3rCommonFn.osParse(ngx.var.http_user_agent);
+	local loadLocationRules = locationConfig["rules"];
+
+	if os == nil then
+		return loadLocationRules["defaultPage"];
+	end;
+	
+	local redirectPage = loadLocationRules[os];
+	return redirectPage == nil and loadLocationRules["defaultPage"] or redirectPage;
+
+end;
+
 functionM["ip"] = ipSplitFlowFn;
 functionM["weight"] = weightSplitFlowFn;
 functionM["flow"] = flowSplitFlowFn;
+functionM["os"] = osSplitFlowFn;
 
 local recordRedirectPage = function(locationName, redirectPage)
 	local redis = require "resty.redis";
 	local red = redis:new();
-	
+
 	red:set_timeout(1000) -- 1 second
 	local redisHost, redisPort = n3rSplitFlowConfig.redisConfig();
 	local ok, err = red:connect(redisHost, redisPort)
@@ -83,7 +98,7 @@ local recordRedirectPage = function(locationName, redirectPage)
 		ngx.log(ngx.ERR, "failed to connect to redis: ", err);
 		return ngx.exit(500);
 	end;
-	
+
 	local siegeResultKey = "n3r.ab.siege.result." .. locationName;
 	local siegeResult = nil;
 	if red:exists(siegeResultKey) == 1 then
@@ -111,7 +126,7 @@ _M.rotePage = function(locationName)
 		ngx.log(ngx.ERR, "location name not found : ", locationName);
 		return ngx.exit(500);
 	end;
-	
+
 	local cachePageAddr = ngx.var.cookie_cachePageAddr;
 	local testMode = n3rCommonFn.booleanValue(locationConfig["testMode"]);
 	if not testMode and cachePageAddr ~= nil then
@@ -122,11 +137,11 @@ _M.rotePage = function(locationName)
 	local fn = functionM[method];
 	local redirectPage = fn(locationConfig);
 	ngx.header["Set-Cookie"] = "cachePageAddr=" .. redirectPage;
-	
+
 	if testMode then
 		recordRedirectPage(locationName, redirectPage);
 	end;
-	
+
 	return redirectPage;
 end;
 

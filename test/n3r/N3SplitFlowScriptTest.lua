@@ -1,4 +1,4 @@
-local n3rCommonFn = require("n3r.N3rCommonFn");
+local n3rCommonFn = require("n3r.N3rCommonFn");  
 local splitFlowInit = require("n3r.SplitFlowInit");
 local splitFlow = require("n3r.SplitFlow");
 
@@ -16,6 +16,10 @@ describe("test N3rCommonFn #N3rCommonFn", function()
 		assert.is_false(n3rCommonFn.booleanValue(nil));
 		assert.is_false(n3rCommonFn.booleanValue(false));
 		assert.is_false(n3rCommonFn.booleanValue("error"));
+	end)
+	
+	it("check osParse", function()
+		assert.are.equals("Win 7", n3rCommonFn.osParse("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36"));
 	end)
 end)
 
@@ -89,7 +93,8 @@ ngx.say = function(msg)
 	return msg;
 end;
 ngx.var = {
-	remote_addr = "192.168.126.4"
+	remote_addr = "192.168.126.4",
+	http_user_agent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36"
 };
 
 
@@ -113,5 +118,10 @@ describe("test splitFlow #splitFlow", function()
 	it("check rotePage by weightConfig", function()
 		local page = splitFlow.rotePage("weightConfig");
 		assert.is.truthy(page);
+	end)
+	
+	it("check rotePage by osConfig", function()
+		local page = splitFlow.rotePage("osConfig");
+		assert.are.equals("html/one.html", page);
 	end)
 end)

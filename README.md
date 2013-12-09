@@ -105,6 +105,18 @@ n3r-abtest
 					["192.168.126.4-192.168.126.5"] = "html/two.html",
 					default = "html/three.html"
 				}
+			},
+
+			-- os Config
+			{
+				locationName = "osConfig",
+				method = "os",
+				testMode = false,
+				rule = {
+					["Win 7"] = "html/one.html",
+					["Mac"] = "html/two.html",
+					default = "html/three.html"
+				}
 			}
 		}
 	}
@@ -194,6 +206,26 @@ n3r-abtest
    3). 这里必须要提到另外一个全局配置<br/>
    flowLimitRate = "30%" (30%可以为任意分流概率百分比)<br/>
    4). 比如上面的配置 当客户端发起访问请求时，有30%概率跳转到限流页面html/two.html, 而且每次成功跳转则计数器+1， 当发现已经超过分流次数限制(2次)，则之后的所有请求都访问default配置的默认页面 html/three.html
+
+   + 根据os(操作系统)分流配置规则说明：
+   ```lua
+   		-- os Config
+		{
+			locationName = "osConfig",
+			method = "os",
+			testMode = false,
+			rule = {
+				["Win 7"] = "html/one.html",
+				["Mac"] = "html/two.html",
+				default = "html/three.html"
+			}
+		}
+   ```
+   1). method必须为"os"<br/>
+   2). rule对应规则：<br/>
+       操作系统 = 对应页面，default为超过限流次数后的默认访问页面。<br/>
+   3). 操作系统可选项为：Win 8\Win 7\Win Vista\Win XP\Win 2000\Win NT\Win Me\Win 98\Win 95\Win CE\Win Phone\iPod\iPod\iPhone\Mac\Android\Symbian\Linux\BlackBerry\Nokia <br/>
+   4). 取用户访问的http_user_agent变量，判断对应操作系统和跳转页面，当找不到对应页面时跳转至默认访问页面。<br/>
 
 
 4. 说明一下testMode(测试模式)作用 ： <br/>

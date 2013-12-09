@@ -60,7 +60,7 @@ _M.init = function()
 			rule['max'] = 10000;
 			rule['page'] = defaultPage;
 			table.insert(rules, rule);
-		else
+		elseif method == "flow" then
 			param = 0;
 			for key, value in pairs(configRule) do
 				if key == "default" then
@@ -68,6 +68,14 @@ _M.init = function()
 				else
 					rules["limitTime"] = tonumber(key);
 					rules["redirectPage"] = value;
+				end;
+			end;
+		else
+			for key, value in pairs(configRule) do
+				if key == "default" then
+					rules["defaultPage"] = value; -- default type
+				else
+					rules[key] = value;
 				end;
 			end;
 		end;
