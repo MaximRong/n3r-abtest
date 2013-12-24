@@ -7,8 +7,8 @@ _SeigeResult.result = function()
 	local redis = require "resty.redis";
 	local red = redis:new();
 	
-	local n3rSplitFlowConfig = require "n3r.N3rSplitFlowConfig";
-	local redisHost, redisPort = n3rSplitFlowConfig.redisConfig();
+	local redisHost = abConfigCache["redisHost"];
+	local redisPort = abConfigCache["redisPort"];
 	red:set_timeout(1000) -- 1 second
 	local ok, err = red:connect("127.0.0.1", 6379)
 	if not ok then

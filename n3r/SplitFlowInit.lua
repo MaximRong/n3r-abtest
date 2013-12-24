@@ -3,12 +3,15 @@ local _M = {
 }
 
 
-_M.init = function()
+_M.init = function(config)
 	local abConfigCache = {};
-
-	local n3rSplitFlowConfig = require "n3r.N3rSplitFlowConfig";
+	
+	abConfigCache["redisHost"] = config["redisHost"];
+	abConfigCache["redisPort"] = config["redisPort"];
+	abConfigCache["testMode"] = config["testMode"];
+	
 	local n3rCommonFn = require "n3r.N3rCommonFn";
-	local ruleConfigs = n3rSplitFlowConfig.allSplitRules();
+	local ruleConfigs = config["splitRules"];
 
 	for index, locationConfig in ipairs(ruleConfigs) do
 

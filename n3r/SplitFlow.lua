@@ -5,7 +5,6 @@ local _M = {
 
 local functionM = {};
 local n3rCommonFn = require "n3r.N3rCommonFn";
-local n3rSplitFlowConfig = require "n3r.N3rSplitFlowConfig";
 local cjson = require "cjson";
 
 --------------------------------- function --------------------------------------------
@@ -51,7 +50,7 @@ local weightSplitFlowFn = function(locationConfig)
 end;
 
 local flowSplitFlowFn = function(locationConfig)
-	local flowLimitRate = n3rSplitFlowConfig.getFlowLimitRateNumber();
+	local flowLimitRate = n3rCommonFn.rateToNumber(locationConfig["flowLimitRate"]);
 	local randomNum = math.random(1, 100);
 
 	local loadLocationRules = locationConfig["rules"];
@@ -103,7 +102,8 @@ local recordRedirectPage = function(locationName, redirectPage)
 	local red = redis:new();
 
 	red:set_timeout(1000) -- 1 second
-	local redisHost, redisPort = n3rSplitFlowConfig.redisConfig();
+	local redisHost = abConfigCache["redisHost"];
+	local redisPort = abConfigCache["redisPort"];
 	local ok, err = red:connect(redisHost, redisPort)
 	if not ok then
 		ngx.log(ngx.ERR, "failed to connect to redis: ", err);
@@ -155,11 +155,11 @@ _M.rotePage = function(locationName)
 		ngx.log(ngx.ERR, "location name not found : ", locationName);
 		return ngx.exit(500);
 	end;
-	
+
 	local cookieKey = getCookieKey(locationConfig, locationName);
 	local cachePageAddr = ngx.var["cookie_" .. cookieKey];
-	local testMode = n3rCommonFn.booleanValue(locationConfig["testMode"]);
-	
+	local testMode = n3rCommonFn.booleanValue(abConfigCache["testMode"]);
+
 	if not testMode and cachePageAddr ~= nil then
 		return cachePageAddr;
 	end;
@@ -167,7 +167,8 @@ _M.rotePage = function(locationName)
 	local method = locationConfig["method"];
 	local fn = functionM[method];
 	local redirectPage = fn(locationConfig);
-	 ngx.header["Set-Cookie"] = cookieKey .. "=" .. redirectPage;
+	local expires = 3600 * 24;
+	ngx.header["Set-Cookie"] = cookieKey .. "=" .. redirectPage .. "; Path=/; Expires=" .. ngx.cookie_time(ngx.time() + expires);
 
 	if testMode then
 		recordRedirectPage(locationName, redirectPage);

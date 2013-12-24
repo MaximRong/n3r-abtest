@@ -33,6 +33,12 @@ _M.strContains = function(string, pattern)
 	return string.find(string, pattern) ~= nil;
 end;
 
+_M.rateToNumber = function(string)
+	local pattern = "^(%d+)%%$";
+	local number = string:gsub(pattern, "%1");
+	return tonumber(number);
+end;
+
 _M.osParse = function(userAgent)
 
 	if _M.strContains(userAgent, "Windows") then
