@@ -8,11 +8,12 @@ local _Config = {
 		-- locationName abtest rule
 		{
 			locationName = "abtest",
-			method = "os",
-			testMode = false,
+			method = "var",
+			testMode = true,
+			var = "province",
 			rule = {
-				["Win 7"] = "html/one.html",
-				["Mac"] = "html/two.html",
+				["11"] = "html/one.html",
+				["12"] = "html/two.html",
 				default = "html/three.html"
 			}
 		},
@@ -60,6 +61,19 @@ local _Config = {
 			rule = {
 				["Win 7"] = "html/one.html",
 				["Mac"] = "html/two.html",
+				default = "html/three.html"
+			}
+		},
+		
+		-- nginx variable Config
+		{
+			locationName = "varConfig",
+			method = "var",
+			testMode = false,
+			var = "province",
+			rule = {
+				["11"] = "html/one.html",
+				["12"] = "html/two.html",
 				default = "html/three.html"
 			}
 		}

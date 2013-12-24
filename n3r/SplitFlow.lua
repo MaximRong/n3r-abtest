@@ -76,16 +76,27 @@ local osSplitFlowFn = function(locationConfig)
 	if os == nil then
 		return loadLocationRules["defaultPage"];
 	end;
-	
+
 	local redirectPage = loadLocationRules[os];
 	return redirectPage == nil and loadLocationRules["defaultPage"] or redirectPage;
 
+end;
+
+local varSplitFn = function(locationConfig)
+
+	local key = locationConfig["param"];
+	local value = ngx.var[key];
+
+	local loadLocationRules = locationConfig["rules"];
+	local redirectPage = loadLocationRules[value];
+	return redirectPage == nil and loadLocationRules["defaultPage"] or redirectPage;
 end;
 
 functionM["ip"] = ipSplitFlowFn;
 functionM["weight"] = weightSplitFlowFn;
 functionM["flow"] = flowSplitFlowFn;
 functionM["os"] = osSplitFlowFn;
+functionM["var"] = varSplitFn;
 
 local recordRedirectPage = function(locationName, redirectPage)
 	local redis = require "resty.redis";

@@ -70,6 +70,15 @@ _M.init = function()
 					rules["redirectPage"] = value;
 				end;
 			end;
+		elseif method == "var" then
+			param = locationConfig["var"];
+			for key, value in pairs(configRule) do
+				if key == "default" then
+					rules["defaultPage"] = value; -- default type
+				else
+					rules[key] = value;
+				end;
+			end;
 		else
 			for key, value in pairs(configRule) do
 				if key == "default" then
