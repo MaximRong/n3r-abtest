@@ -20,6 +20,14 @@ _M.booleanValue = function(str)
 	return false;
 end;
 
+_M.split = function(str, pat)
+	local t = {};
+	for i in string.gmatch(str, pat) do
+		table.insert(t, i);
+	end
+	return t;
+end;
+
 _M.strContains = function(string, pattern)
 
 	return string.find(string, pattern) ~= nil;

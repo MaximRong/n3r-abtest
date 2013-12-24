@@ -17,6 +17,7 @@ _M.init = function()
 		local rules = {};
 		local param = nil;
 		local method = locationConfig["method"];
+		
 		if method == "ip" then
 			for key, value in pairs(configRule) do
 				local rule = {};

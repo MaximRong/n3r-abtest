@@ -9,8 +9,9 @@ local _Config = {
 		{
 			locationName = "abtest",
 			method = "var",
-			testMode = true,
+			testMode = false,
 			var = "province",
+			cookie = "$province, 11",
 			rule = {
 				["11"] = "html/one.html",
 				["12"] = "html/two.html",

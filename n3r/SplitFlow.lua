@@ -130,6 +130,24 @@ local recordRedirectPage = function(locationName, redirectPage)
 	red:set(siegeResultKey, siegeResultStr);
 end;
 
+local getCookieKey = function(locationConfig, locationName)
+	local cookie = locationName;
+	local configCookie = locationConfig["cookie"];
+	if configCookie ~= nil then
+		local configCookies = n3rCommonFn.split(configCookie, "[^,%s]+");
+		for key, value in ipairs(configCookies) do
+			if string.find(value, "%$") ~= nil then
+				local var = string.sub(value, 2);
+				local add = ngx.var[var];
+				cookie = cookie .. add;
+			else
+				cookie = cookie .. value;
+			end
+		end;
+	end;
+	return cookie;
+end;
+
 _M.rotePage = function(locationName)
 
 	local locationConfig = abConfigCache[locationName];
@@ -137,9 +155,11 @@ _M.rotePage = function(locationName)
 		ngx.log(ngx.ERR, "location name not found : ", locationName);
 		return ngx.exit(500);
 	end;
-
-	local cachePageAddr = ngx.var.cookie_cachePageAddr;
+	
+	local cookieKey = getCookieKey(locationConfig, locationName);
+	local cachePageAddr = ngx.var["cookie_" .. cookieKey];
 	local testMode = n3rCommonFn.booleanValue(locationConfig["testMode"]);
+	
 	if not testMode and cachePageAddr ~= nil then
 		return cachePageAddr;
 	end;
@@ -147,7 +167,7 @@ _M.rotePage = function(locationName)
 	local method = locationConfig["method"];
 	local fn = functionM[method];
 	local redirectPage = fn(locationConfig);
-	ngx.header["Set-Cookie"] = "cachePageAddr=" .. redirectPage;
+	 ngx.header["Set-Cookie"] = cookieKey .. "=" .. redirectPage;
 
 	if testMode then
 		recordRedirectPage(locationName, redirectPage);
