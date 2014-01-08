@@ -10,7 +10,7 @@ local cjson = require "cjson";
 --------------------------------- function --------------------------------------------
 
 local ipSplitFlowFn = function(locationConfig)
-	local remote_addr = ngx.var.remote_addr; -- 要改成x-forwarded-for
+	local remote_addr = ngx.var.remote_addr; -- 要锟侥筹拷x-forwarded-for
 	local loadLocationRules = locationConfig["rules"];
 	local remoteInt = n3rCommonFn.addressNo(remote_addr);
 	local defaultPage = nil;
@@ -161,14 +161,23 @@ _M.rotePage = function(locationName)
 	local testMode = n3rCommonFn.booleanValue(abConfigCache["testMode"]);
 
 	if not testMode and cachePageAddr ~= nil then
+		local expires = 3600 * 24;
+		local expires = ngx.cookie_time(ngx.time() + expires);
+		ngx.header["Set-Cookie"] = "n3ABresult=" .. locationName .. cachePageAddr .. "; Path=/; Expires=" .. expires;
 		return cachePageAddr;
 	end;
 
 	local method = locationConfig["method"];
 	local fn = functionM[method];
+	
+	-- record cookie
 	local redirectPage = fn(locationConfig);
 	local expires = 3600 * 24;
-	ngx.header["Set-Cookie"] = cookieKey .. "=" .. redirectPage .. "; Path=/; Expires=" .. ngx.cookie_time(ngx.time() + expires);
+	local cookies = {};
+	local expires = ngx.cookie_time(ngx.time() + expires);
+	table.insert(cookies, cookieKey .. "=" .. redirectPage .. "; Path=/; Expires=" .. expires);
+	table.insert(cookies, "n3ABresult=" .. locationName .. redirectPage .. "; Path=/; Expires=" .. expires);
+	ngx.header["Set-Cookie"] = cookies;
 
 	if testMode then
 		recordRedirectPage(locationName, redirectPage);
