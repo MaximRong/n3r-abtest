@@ -256,6 +256,22 @@ n3r-abtest
     1). 当为false, 则代表测试模式关闭，那么cookie中会记录用户曾经访问过该location对应跳转页面，那么用户下一次再请求同一location时则会直接跳转到之间访问的页面。另外用户请求后不会记录相关的访问日志。<br/>
 	2). 当为true，则代表测试模式打开，那么所有请求都将不记录cookie，用户每次访问都会重新根据规则匹配，有可能访问的不是同一页面。另外当每次用户请求后，都会记录相关访问日志。<br/>
 
+设置跳转页面
+--------------
+1. 在nginx中，增加如下配置:
+```nginx
+   location /setCookie {
+         default_type text/html;
+         charset 'utf-8';
+             content_by_lua '
+                   local ABCookieSet = require "n3r.ABCookieSet";
+                   ABCookieSet.set();
+             ';
+ 
+         }
+```
+访问 host:port/setCookie 就能看到页面跳转设置页，再此页设置后，对应的location只会跳到指定的页面(前提是testMode必须为false)。
+
 压力测试:
 -----------
 
@@ -299,3 +315,8 @@ n3r-abtest
 3. 增加根据nginx变量分流规则<br/>
 4. cookie增加超时时间<br/>
 5. 优化配置语法<br/>
+
+
+##### 2014-1-8 :
+1. 增加一个固定设置跳转页面
+2. 提供一个全局跳转后的cookie cookie名为 ： n3ABresult
