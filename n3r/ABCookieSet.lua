@@ -29,7 +29,7 @@ _ABCookieSet.set = function()
 		if key ~= "redisHost" and key ~= "redisPort" and key ~= "testMode" then
 			local desc = cacheValue["desc"];
 			html = html .. "<p/><p/>";
-			html = html .. "当前的配置是 针对： " .. desc;
+			html = html .. "当前的配置是针对： " .. desc;
 			local rules = cacheValue["rules"];
 			local length = 0;
 			local method = cacheValue["method"];
