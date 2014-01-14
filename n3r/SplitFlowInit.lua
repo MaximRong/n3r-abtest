@@ -43,8 +43,10 @@ _M.init = function(config)
 			local periphery = 0;
 			local pattern = "^(%d+)%%$";
 			local defaultPage =  nil;
-			for key, value in pairs(configRule) do
+			for index, config in ipairs(configRule) do
 				local rule = {};
+				local key = n3rCommonFn.split(config, "[^,%s]+")[1];
+				local value = n3rCommonFn.split(config, "[^,%s]+")[2];
 				if key == "default" then
 					defaultPage = value; -- default type
 				else
@@ -59,11 +61,13 @@ _M.init = function(config)
 					table.insert(rules, rule);
 				end;
 			end;
-			local rule = {};
-			rule['min'] = periphery;
-			rule['max'] = 10000;
-			rule['page'] = defaultPage;
-			table.insert(rules, rule);
+			if defaultPage ~= nil then
+				local rule = {};
+				rule['min'] = periphery;
+				rule['max'] = 10000;
+				rule['page'] = defaultPage;
+				table.insert(rules, rule);
+			end;
 		elseif method == "flow" then
 			param = 0;
 			for key, value in pairs(configRule) do

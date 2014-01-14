@@ -10,7 +10,7 @@ local cjson = require "cjson";
 --------------------------------- function --------------------------------------------
 
 local ipSplitFlowFn = function(locationConfig)
-	local remote_addr = ngx.var.remote_addr; -- Ҫ�ĳ�x-forwarded-for
+	local remote_addr = ngx.var.remote_addr; 
 	local loadLocationRules = locationConfig["rules"];
 	local remoteInt = n3rCommonFn.addressNo(remote_addr);
 	local defaultPage = nil;
@@ -35,7 +35,7 @@ end;
 local weightSplitFlowFn = function(locationConfig)
 	local sum = locationConfig["param"];
 	local randomNum = math.random(1, sum);
-
+	
 	local loadLocationRules = locationConfig["rules"];
 
 	local redirect = nil;
@@ -149,7 +149,7 @@ local getCookieKey = function(locationConfig, locationName)
 end;
 
 _M.rotePage = function(locationName)
-
+	
 	local locationConfig = abConfigCache[locationName];
 	if not locationConfig then
 		ngx.log(ngx.ERR, "location name not found : ", locationName);
@@ -157,13 +157,15 @@ _M.rotePage = function(locationName)
 	end;
 
 	local cookieKey = getCookieKey(locationConfig, locationName);
-	local cachePageAddr = ngx.var["cookie_" .. cookieKey];
+	local cookiePageAddr = ngx.var["cookie_" .. cookieKey];
 	local testMode = n3rCommonFn.booleanValue(abConfigCache["testMode"]);
-
-	if not testMode and cachePageAddr ~= nil then
+	
+	if not testMode and cookiePageAddr ~= nil then
 		local expires = 3600 * 24;
 		local expires = ngx.cookie_time(ngx.time() + expires);
-		ngx.header["Set-Cookie"] = "n3ABresult=" .. locationName .. cachePageAddr .. "; Path=/; Expires=" .. expires;
+		local cachePageAddr = ndk.set_var.set_decode_base32(cookiePageAddr);
+		cachePageAddr = ndk.set_var.set_decrypt_session(cachePageAddr);
+		ngx.header["Set-Cookie"] = "n3ABresult=" .. locationName .. cookiePageAddr .. "; Path=/; Expires=" .. expires;
 		return cachePageAddr;
 	end;
 
@@ -172,17 +174,19 @@ _M.rotePage = function(locationName)
 	
 	-- record cookie
 	local redirectPage = fn(locationConfig);
+	
 	local expires = 3600 * 24;
 	local cookies = {};
 	local expires = ngx.cookie_time(ngx.time() + expires);
-	table.insert(cookies, cookieKey .. "=" .. redirectPage .. "; Path=/; Expires=" .. expires);
-	table.insert(cookies, "n3ABresult=" .. locationName .. redirectPage .. "; Path=/; Expires=" .. expires);
+	local cookieValue = ndk.set_var.set_encrypt_session(redirectPage);
+	cookieValue = ndk.set_var.set_encode_base32(cookieValue);
+	table.insert(cookies, cookieKey .. "=" .. cookieValue .. "; Path=/; Expires=" .. expires);
+	table.insert(cookies, "n3ABresult=" .. locationName .. cookieValue .. "; Path=/; Expires=" .. expires);
 	ngx.header["Set-Cookie"] = cookies;
 
 	if testMode then
 		recordRedirectPage(locationName, redirectPage);
 	end;
-
 	return redirectPage;
 end;
 

@@ -23,6 +23,11 @@ local getCookieKey = function(locationConfig, locationName)
 	return cookie;
 end;
 
+local encryptValue = function(value)
+	local cookieValue = ndk.set_var.set_encrypt_session(value);
+	return ndk.set_var.set_encode_base32(cookieValue);
+end;
+
 _ABCookieSet.set = function()
 	local html = "<h1>设置指定ab测试访问页面</h1>";
 	for key, cacheValue in pairs(abConfigCache) do
@@ -57,22 +62,22 @@ _ABCookieSet.set = function()
 			if "ip" == method or "weight" == method then
 				for index, rule in ipairs(rules) do
 					local page = rule["page"];
-					html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. page .. " />" .. page .. "</td>";
+					html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. encryptValue(page) .. " />" .. page .. "</td>";
 					length = length + 1;
 				end;
 			elseif "flow" == method then
 					local defaultPage = rules["defaultPage"];
 					local redirectPage = rules["redirectPage"];
-					html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. defaultPage .. " />" .. defaultPage .. "</td>";
-					html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. redirectPage .. " />" .. redirectPage .. "</td>";
+					html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. encryptValue(defaultPage) .. " />" .. defaultPage .. "</td>";
+					html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. encryptValue(redirectPage) .. " />" .. redirectPage .. "</td>";
 					length = 2;
 			else
 				local defaultPage = rules["defaultPage"];
-				html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. defaultPage .. " />" .. defaultPage .. "</td>";
+				html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. encryptValue(defaultPage) .. " />" .. defaultPage .. "</td>";
 				length = 1;
 				for ruleKey, page in pairs(rules) do
 					if "defaultPage" ~= ruleKey then
-					html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. page .. " />" .. page .. "</td>";
+					html = html .. "<td><input name=Fruit" .. method .. " type=radio value=" .. encryptValue(page) .. " />" .. page .. "</td>";
 					length = length + 1;
 					end;
 				end;
