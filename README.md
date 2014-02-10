@@ -82,9 +82,8 @@ n3r-abtest
 					locationName = "weightConfig",
 					method = "weight",
 					rule = {
-						["20%"] = "html/one.html",
-						["40%"] = "html/two.html",
-						default = "html/three.html"
+						"50% /app/mall-res/static A",
+					        "50% /app/mall-res/staticAB B"
 					}
 				},
 
@@ -104,9 +103,8 @@ n3r-abtest
 					locationName = "osConfig",
 					method = "os",
 					rule = {
-						["Win 7"] = "html/one.html",
-						["Mac"] = "html/two.html",
-						default = "html/three.html"
+						"computer /app/mall-res/static A",
+					         "phone /app/mall-res/staticAB B"
 					}
 				},
 				
@@ -320,3 +318,9 @@ n3r-abtest
 ##### 2014-1-8 :
 1. 增加一个固定设置跳转页面
 2. 提供一个全局跳转后的cookie cookie名为 ： n3ABresult
+
+#### 2014-2-10
+1. 提交weight和os新的代码
+2. 配置方式改变
+3. 提供加密cookie
+4. 废止ip flow var配置
