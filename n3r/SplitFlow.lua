@@ -15,7 +15,7 @@ local ipSplitFlowFn = function(locationConfig)
 	local remoteInt = n3rCommonFn.addressNo(remote_addr);
 	local defaultPage = nil;
 	local redirect = nil;
-
+	
 	for index, rule in ipairs(loadLocationRules) do
 		local type = rule["type"];
 		if type == 0 then
@@ -34,10 +34,10 @@ end;
 
 local weightSplitFlowFn = function(locationConfig)
 	local sum = locationConfig["param"];
+	math.randomseed( tostring(os.time()):reverse() );
 	local randomNum = math.random(1, sum);
 	
 	local loadLocationRules = locationConfig["rules"];
-
 	local redirect = nil;
 	for index, rule in ipairs(loadLocationRules) do
 		if rule["min"] < randomNum and randomNum <= rule["max"] then
@@ -71,13 +71,13 @@ local osSplitFlowFn = function(locationConfig)
 
 	local os = n3rCommonFn.osParse(ngx.var.http_user_agent);
 	local loadLocationRules = locationConfig["rules"];
-
+	
 	if os == nil then
-		return loadLocationRules["defaultPage"];
+		return loadLocationRules["computer"];
 	end;
 
 	local redirectPage = loadLocationRules[os];
-	return redirectPage == nil and loadLocationRules["defaultPage"] or redirectPage;
+	return redirectPage == nil and loadLocationRules["computer"] or redirectPage;
 
 end;
 
@@ -155,6 +155,8 @@ _M.rotePage = function(locationName)
 		ngx.log(ngx.ERR, "location name not found : ", locationName);
 		return ngx.exit(500);
 	end;
+	
+	local plan = abConfigCache["plan"];
 
 	local cookieKey = getCookieKey(locationConfig, locationName);
 	local cookiePageAddr = ngx.var["cookie_" .. cookieKey];
@@ -165,7 +167,8 @@ _M.rotePage = function(locationName)
 		local expires = ngx.cookie_time(ngx.time() + expires);
 		local cachePageAddr = ndk.set_var.set_decode_base32(cookiePageAddr);
 		cachePageAddr = ndk.set_var.set_decrypt_session(cachePageAddr);
-		ngx.header["Set-Cookie"] = "n3ABresult=" .. locationName .. cookiePageAddr .. "; Path=/; Expires=" .. expires;
+		local r = plan[cachePageAddr];
+		ngx.header["Set-Cookie"] = "n3ABresult=" .. locationName .. "_" .. r .. "; Domain=.10010.com; Path=/; Expires=" .. expires;
 		return cachePageAddr;
 	end;
 
@@ -174,19 +177,22 @@ _M.rotePage = function(locationName)
 	
 	-- record cookie
 	local redirectPage = fn(locationConfig);
+	local r = plan[redirectPage];
 	
 	local expires = 3600 * 24;
 	local cookies = {};
 	local expires = ngx.cookie_time(ngx.time() + expires);
 	local cookieValue = ndk.set_var.set_encrypt_session(redirectPage);
 	cookieValue = ndk.set_var.set_encode_base32(cookieValue);
-	table.insert(cookies, cookieKey .. "=" .. cookieValue .. "; Path=/; Expires=" .. expires);
-	table.insert(cookies, "n3ABresult=" .. locationName .. cookieValue .. "; Path=/; Expires=" .. expires);
+	table.insert(cookies, cookieKey .. "=" .. cookieValue .. "; Path=/; Domain=.10010.com; Expires=" .. expires);
+	table.insert(cookies, "n3ABresult=" .. locationName .. "_" .. r .. "; Path=/; Domain=.10010.com; Expires=" .. expires);
 	ngx.header["Set-Cookie"] = cookies;
-
+	
+	--[[
 	if testMode then
 		recordRedirectPage(locationName, redirectPage);
 	end;
+	]]
 	return redirectPage;
 end;
 

@@ -31,7 +31,7 @@ end;
 _ABCookieSet.set = function()
 	local html = "<h1>设置指定ab测试访问页面</h1>";
 	for key, cacheValue in pairs(abConfigCache) do
-		if key ~= "redisHost" and key ~= "redisPort" and key ~= "testMode" then
+		if key ~= "redisHost" and key ~= "redisPort" and key ~= "testMode" and key ~= "plan" then
 			local desc = cacheValue["desc"];
 			html = html .. "<p/><p/>";
 			html = html .. "当前的配置是针对： " .. desc;
@@ -52,7 +52,7 @@ _ABCookieSet.set = function()
 		                        break;
 		                    }
 		                }
-		                var cookie = "]] .. cookieKey .. [[ = " + value;
+		                var cookie = "]] .. cookieKey .. [[ = " + value + ";Domain=.10010.com;";
 						document.cookie=cookie;
 					}
 					</script>

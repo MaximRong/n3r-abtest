@@ -12,7 +12,9 @@ _M.init = function(config)
 	
 	local n3rCommonFn = require "n3r.N3rCommonFn";
 	local ruleConfigs = config["splitRules"];
-
+	
+	local plan = {};
+	
 	for index, locationConfig in ipairs(ruleConfigs) do
 
 		local configRule = locationConfig["rule"];
@@ -45,8 +47,11 @@ _M.init = function(config)
 			local defaultPage =  nil;
 			for index, config in ipairs(configRule) do
 				local rule = {};
-				local key = n3rCommonFn.split(config, "[^,%s]+")[1];
-				local value = n3rCommonFn.split(config, "[^,%s]+")[2];
+				local t = n3rCommonFn.split(config, "[^,%s]+");
+				local key = t[1];
+				local value = t[2];
+				plan[value] = t[3];
+				
 				if key == "default" then
 					defaultPage = value; -- default type
 				else
@@ -88,12 +93,12 @@ _M.init = function(config)
 				end;
 			end;
 		else
-			for key, value in pairs(configRule) do
-				if key == "default" then
-					rules["defaultPage"] = value; -- default type
-				else
-					rules[key] = value;
-				end;
+			for index, config in ipairs(configRule) do
+			  local t = n3rCommonFn.split(config, "[^,%s]+");
+        local key = t[1];
+        local value = t[2];
+        plan[value] = t[3];
+				rules[key] = value;
 			end;
 		end;
 
@@ -102,6 +107,7 @@ _M.init = function(config)
 
 		local locationName = locationConfig['locationName'];
 		abConfigCache[locationName] = locationConfig;
+		abConfigCache["plan"] = plan;
 	end;
 
 	return abConfigCache;
